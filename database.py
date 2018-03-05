@@ -17,6 +17,7 @@ cursor = db.cursor()
 # cursor.execute('''INSERT INTO users(email, password)
 #                   VALUES(?,?)''', (email1, pass1))
 # print('First user inserted')
+# db.commit()
 
 # cursor.execute('''INSERT INTO users(email, password)
 #                   VALUES(?,?)''', (email2, pass2))

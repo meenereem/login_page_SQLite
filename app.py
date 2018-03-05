@@ -21,13 +21,16 @@ def home():
 #     cursor = db.cursor()
 #     cursor.execute('SELECT * from users')
 #     if request.method == 'POST':
-@app.route('/signup.html')
+@app.route('/signup', methods=['GET', 'POST'])
 def do_admin_signup():
-    return render_template('signup.html')
+    if request.method == 'GET':
+        return render_template('signup.html')
     db = sqlite3.connect("Untitled\\users\\Meenereem\\desktop\\database.db")
     cursor = db.cursor()
     exist = False
+    cursor.execute('SELECT * from users')
     if request.method == 'POST':
+        print('we are posting')
         for row in cursor:
             if request.form['username'] == row[1] and request.form['password'] == row[2]:
                 exist = True
@@ -35,13 +38,12 @@ def do_admin_signup():
             cursor.execute('''INSERT INTO users(email, password)
             VALUES(?,?)''', (request.form['username'], request.form['password']))
             print('user inserted')
+            # cursor.execute('''INSERT INTO users(email, password)
+            # VALUES(?,?)''', [request.form['username'], request.form['password']])
             db.commit()
+            return render_template('login.html')
         else:
             return render_template('signup.html')
-
-
-
-
 
 @app.route('/login', methods=['POST'])
 def do_admin_login():
