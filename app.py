@@ -4,12 +4,12 @@ from flask import request
 from flask import render_template
 import os
 from sqlalchemy.orm import sessionmaker
-from tabledef import *
 from users import *
 import sqlite3
 import bcrypt
 # engine = create_engine('sqlite:///tutorial.db', echo=True)
 app = Flask(__name__)
+db = sqlite3.connect("Untitled\\users\\Meenereem\\desktop\\database.db",  check_same_thread=False)
 
 @app.route('/')
 def home():
@@ -20,28 +20,13 @@ def home():
 def do_admin_signup():
     if request.method == 'GET':
         return render_template('signup.html')
-    db = sqlite3.connect("Untitled\\users\\Meenereem\\desktop\\database.db")
-    cursor = db.cursor()
-    exist = False
-    cursor.execute('SELECT * from users')
-    if request.method == 'POST':
-        print('we are posting')
-        for row in cursor:
-            password = request.form['password']
-            hashed = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt(10))
-            if request.form['username'] == row[1] and bcrypt.checkpw(password.encode('utf-8'), hashed):
-                exist = True
-        if exist == False:
-            password = request.form['password']
-            hashed = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt(10))
-            cursor.execute('''INSERT INTO users(email, password)
-            VALUES(?,?)''', (request.form['username'], hashed))
-            print('user inserted')
-            db.commit()
-            return render_template('login.html')
-        else:
-            return render_template('signup.html', message = "username or password already exists")
-            print('already exists')
+    if is_email_already_taken(db, request.form['username']) == False:
+        password = request.form['password']
+        hashed = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt(10))
+        create(db, request.form['username'], hashed)
+        return render_template('login.html')
+    else:
+        return render_template('signup.html', message = "username or password already exists")
 
 @app.route('/login', methods=['POST'])
 def do_admin_login():
