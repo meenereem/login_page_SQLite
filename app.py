@@ -6,6 +6,7 @@ import os
 from sqlalchemy.orm import sessionmaker
 from tabledef import *
 import sqlite3
+import bcrypt
 # engine = create_engine('sqlite:///tutorial.db', echo=True)
 app = Flask(__name__)
 
@@ -14,13 +15,6 @@ def home():
     if not session.get('logged_in'):
         return render_template('login.html')
  
-
-# @app.route('/signup', methods=['POST'])
-# def do_admin_signup():
-    #db = sqlite3.connect("Untitled\\users\\Meenereem\\desktop\\database.db")
-#     cursor = db.cursor()
-#     cursor.execute('SELECT * from users')
-#     if request.method == 'POST':
 @app.route('/signup', methods=['GET', 'POST'])
 def do_admin_signup():
     if request.method == 'GET':
@@ -32,44 +26,37 @@ def do_admin_signup():
     if request.method == 'POST':
         print('we are posting')
         for row in cursor:
-            if request.form['username'] == row[1] and request.form['password'] == row[2]:
+            password = request.form['password']
+            hashed = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt(10))
+            if request.form['username'] == row[1] and bcrypt.checkpw(password.encode('utf-8'), hashed):
                 exist = True
         if exist == False:
+            password = request.form['password']
+            hashed = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt(10))
             cursor.execute('''INSERT INTO users(email, password)
-            VALUES(?,?)''', (request.form['username'], request.form['password']))
+            VALUES(?,?)''', (request.form['username'], hashed))
             print('user inserted')
-            # cursor.execute('''INSERT INTO users(email, password)
-            # VALUES(?,?)''', [request.form['username'], request.form['password']])
             db.commit()
             return render_template('login.html')
         else:
-            return render_template('signup.html')
+            return render_template('signup.html', message = "username or password already exists")
+            print('already exists')
 
 @app.route('/login', methods=['POST'])
 def do_admin_login():
-    # POST_USERNAME = str(request.form['username'])
-    # POST_PASSWORD = str(request.form['password'])
-    # Session = sessionmaker(bind=engine)
-    # s = Session()
-    # query = s.query(User).filter(User.username.in_([POST_USERNAME]), User.password.in_([POST_PASSWORD]) )
-    # result = query.first()
-    # print(result)
     db = sqlite3.connect("Untitled\\users\\Meenereem\\desktop\\database.db")
     cursor = db.cursor()
     cursor.execute('SELECT * from users')
     if request.method == 'POST':
+        password = request.form['password']
+        hashed = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt(10))
         for row in cursor:
-            print(row)
-            if request.form['username'] == row[1] and request.form['password'] == row[2]:
+            if request.form['username'] == row[1] and bcrypt.checkpw(password.encode('utf-8'), hashed):
                 session['username'] = request.form['username']
                 session['password'] = request.form['password']
                 return render_template('index.html', email = row[1])
     else:
         error = 'Invalid Credentials. Please try again.'
-    # if result:
-    #     session['logged_in'] = True
-    # else:
-    #     flash('wrong password!')
     return home()
  
 @app.route("/logout")
