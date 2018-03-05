@@ -2,7 +2,7 @@ import sqlite3
 # Create a database in RAM
 # db = sqlite3.connect(':memory:')
 # Creates a file called database.db with a SQLite3 DB
-db = sqlite3.connect("Untitled\\users\\Meenereem\\desktop\\database.db")
+db = sqlite3.connect("Untitled\\users\\Meenereem\\desktop\\database.db",  check_same_thread=False)
 
 cursor = db.cursor()
 # cursor.execute('''
@@ -24,4 +24,4 @@ cursor = db.cursor()
 # print('Second user inserted')
 
 # db.commit()
-db.close()
+#db.close()

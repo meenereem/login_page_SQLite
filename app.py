@@ -5,11 +5,21 @@ from flask import render_template
 import os
 from sqlalchemy.orm import sessionmaker
 from users import *
-import sqlite3
+from database import *
 import bcrypt
+from flask import g
 # engine = create_engine('sqlite:///tutorial.db', echo=True)
 app = Flask(__name__)
-db = sqlite3.connect("Untitled\\users\\Meenereem\\desktop\\database.db",  check_same_thread=False)
+
+@app.before_request
+def before_request():
+    g.db = sqlite3.connect("Untitled\\users\\Meenereem\\desktop\\database.db",  check_same_thread=False)
+
+@app.teardown_request
+def teardown_request(exception):
+    db = getattr(g, 'db', None)
+    if db is not None:
+        db.close()
 
 @app.route('/')
 def home():
@@ -30,7 +40,6 @@ def do_admin_signup():
 
 @app.route('/login', methods=['POST'])
 def do_admin_login():
-    db = sqlite3.connect("Untitled\\users\\Meenereem\\desktop\\database.db")
     cursor = db.cursor()
     cursor.execute('SELECT * from users')
     if request.method == 'POST':
