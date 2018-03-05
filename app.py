@@ -20,11 +20,6 @@ def teardown_request(exception):
     db = getattr(g, 'db', None)
     if db is not None:
         db.close()
-
-@app.route('/')
-def home():
-    if not session.get('logged_in'):
-        return render_template('login.html')
  
 @app.route('/signup', methods=['GET', 'POST'])
 def do_admin_signup():
@@ -40,19 +35,16 @@ def do_admin_signup():
 
 @app.route('/login', methods=['POST'])
 def do_admin_login():
-    cursor = db.cursor()
-    cursor.execute('SELECT * from users')
-    if request.method == 'POST':
-        password = request.form['password']
-        hashed = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt(10))
-        for row in cursor:
-            if request.form['username'] == row[1] and bcrypt.checkpw(password.encode('utf-8'), hashed):
-                session['username'] = request.form['username']
-                session['password'] = request.form['password']
-                return render_template('index.html', email = row[1])
-    else:
-        error = 'Invalid Credentials. Please try again.'
-    return home()
+    password = request.form['password']
+    hashed = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt(10))
+    if is_email_already_taken(db, request.form['username']) == True:
+        obj = get_one_by_email(db, request.form['username'])
+        if bcrypt.checkpw(password.encode('utf-8'), obj.password) == True: 
+            session['username'] = request.form['username']
+            session['password'] = request.form['password']
+            return render_template('index.html', email = obj.email)
+    return render_template('login.html')
+
  
 @app.route("/logout")
 def logout():
