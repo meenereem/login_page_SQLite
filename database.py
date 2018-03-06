@@ -4,7 +4,12 @@ import sqlite3
 # Creates a file called database.db with a SQLite3 DB
 db = sqlite3.connect("Untitled\\users\\Meenereem\\desktop\\database.db",  check_same_thread=False)
 
-cursor = db.cursor()
+#cursor = db_users.cursor()
+
+
+# cursor.execute('''
+#     CREATE TABLE user_sessions( email TEXT unique, token TEXT unique)
+# ''')
 # cursor.execute('''
 #     CREATE TABLE users(id INTEGER PRIMARY KEY, email TEXT unique, password TEXT)
 # ''')
