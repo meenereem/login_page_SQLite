@@ -46,9 +46,9 @@ def do_admin_signup():
 
 @app.route('/email', methods=['POST'])
 def send_result_email():
-        postmark = PostmarkClient(server_token='your server token')
+        postmark = PostmarkClient(server_token='your email')
         postmark.emails.send(
-        From='fkuusisto@morgridge.org',
+        From='email',
         To=request.form['email'],
         Subject='Message',
         HtmlBody=request.form['message'])
