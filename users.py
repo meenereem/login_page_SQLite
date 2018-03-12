@@ -10,12 +10,6 @@ def create_user_account(db, email, password):
     db.commit()
     return get_one_by_email(db, email)
 
-def create_session_token(db, email, token):
-    q_str = "INSERT INTO user_sessions ({1}, {2}) values (?, ?)".format(TABLE_NAME, FIELD_EMAIL, FIELD_TOKEN)
-    c = db.cursor()
-    c.execute(q_str, [email, token])
-    db.commit()
-
 def get_one_by_email(db, email):
     if email is None:
         return None
@@ -39,7 +33,5 @@ def is_email_already_taken(db, email):
 TABLE_NAME = 'users'
 FIELD_EMAIL = 'email'
 FIELD_PASSHASH = 'password'
-TABLE_NAME2 = 'user_sessions'
-FIELD_EMAIL2 = 'email'
-FIELD_TOKEN = 'token'
+
 

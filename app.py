@@ -2,19 +2,18 @@ from flask import Flask, flash, redirect, render_template, request, session, abo
 from flask import request
 from flask import render_template
 import os
-from sqlalchemy.orm import sessionmaker
 from users import *
 from database import *
+from sessions import *
 import bcrypt
 from flask import g
 from postmarker.core import PostmarkClient
-import uuid
 # engine = create_engine('sqlite:///tutorial.db', echo=True)
 app = Flask(__name__)
 
 @app.before_request
 def before_request():
-    g.db = sqlite3.connect("Untitled\\users\\Meenereem\\desktop\\database.db\\users",  check_same_thread=False)
+    g.db = sqlite3.connect("Untitled\\users\\Meenereem\\desktop\\database.db",  check_same_thread=False)
 
 @app.teardown_request
 def teardown_request(exception):
@@ -37,8 +36,6 @@ def do_admin_signup():
         password = request.form['password']
         hashed = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt(10))
         create_user_account(db, request.form['username'], hashed)
-        token = uuid.uuid4().hex
-        create_session_token(db, request.form['username'], token)
         return redirect('/login')
     else:
         return render_template('signup.html', message = "username or password already exists")
@@ -46,15 +43,16 @@ def do_admin_signup():
 
 @app.route('/email', methods=['POST'])
 def send_result_email():
-        postmark = PostmarkClient(server_token='your email')
+        postmark = PostmarkClient(server_token='7547cae9-c42f-4c62-8886-86f034db9fce')
         postmark.emails.send(
-        From='email',
+        From='fkuusisto@morgridge.org',
         To=request.form['email'],
         Subject='Message',
         HtmlBody=request.form['message'])
 
 @app.route('/logout', methods=['POST'])
 def logout():
+        
         session['logged_in'] = False
         return home()
 
@@ -67,9 +65,8 @@ def do_admin_login():
     if is_email_already_taken(db, request.form['username']) == True:
         obj = get_one_by_email(db, request.form['username'])
         if bcrypt.checkpw(password.encode('utf-8'), obj.password) == True:
-            session['logged_in'] = True
-            session['username'] = request.form['username']
-            session['password'] = request.form['password']
+            create_session_token(db, request.form['username'])
+            # if session['token'] == obj2.token:
             return render_template('index.html', email = obj.email)
     return home()
  
