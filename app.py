@@ -10,7 +10,6 @@ from todo_list import *
 import bcrypt
 from flask import g
 from postmarker.core import PostmarkClient
-# engine = create_engine('sqlite:///tutorial.db', echo=True)
 app = Flask(__name__)
 
 @app.before_request
@@ -84,7 +83,6 @@ def todo():
             tasks = select_all_tasks(db, user.email)
         return render_template('todo.html', tasks=tasks)
         
-
 
 @app.route('/todo_delete', methods=['POST'])
 def del_task():
