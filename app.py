@@ -72,25 +72,25 @@ def route():
 
 @app.route('/todopage', methods=['POST', 'GET'])
 def todo():
-    if corr_user() == False:
-        return redirect('/login')
+    if request.method == 'GET':
+        if corr_user() == False:
+            return redirect('/login')
+        else:
+            return render_template('todo.html')
     else:
-        return render_template('todo.html')
+        user = get_logged_in_user()
+        if request.form['task'] != None:
+            add_todo_task(db, user.email, request.form['task'])
+            tasks = select_all_tasks(db, user.email)
+        return render_template('todo.html', tasks=tasks)
+        
 
 
-@app.route('/todo', methods=['POST', 'GET'])
-def add_task():
-    user = get_logged_in_user()
-    if request.form['task'] != None:
-        add_todo_task(db, user.email, request.form['task'])
-        tasks = select_all_tasks(db, user.email)
-    return render_template('todo.html', tasks=tasks)
+@app.route('/todo_delete', methods=['POST'])
 def del_task():
-    var = json.load(request.body)
-
-# @app.route('/todo', methods=['POST', 'GET'])
-# def del_task():
-#     if request.form['del_entry']:  
+    var = request.json
+    delete_selected_task(db, request.form['task_id'])
+    return jsonify({"success": True})
     
 
 @app.route('/Index', methods=['POST', 'GET'])

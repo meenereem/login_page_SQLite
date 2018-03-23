@@ -17,10 +17,10 @@ def select_all_tasks(db, email):
     tasks = [Task(r[0], r[1], r[2]) for r in c.fetchall()]
     return tasks
 
-# def delete_selected_task(db, task):
-#     c = db.cursor()
-#     c.execute('delete from todo_list where task = ?', [task])
-#     db.commit()
+def delete_selected_task(db, task_id):
+    c = db.cursor()
+    c.execute('delete from todo_list where task_id = ?', [task_id])
+    db.commit()
 
 
 

@@ -1,13 +1,13 @@
 <head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
     <script src="/static/todo.js"></script>
 </head>
-<form action="/todo" method="POST">
 <div id="f" class="page">
     <h1>Task List</h1>
     <ul>
             {% for thing in tasks %}
             <li id={{thing.task_id~"_item"}}><h>{{thing.task}}</h>
-            <button id={{thing.task_id~"_button"}}> Delete Task</button>
+            <a href="#" class="delete_button" id={{thing.task_id}} onclick="deleteTask(this)"> Delete Task</a>
             </li>
             {% endfor %}
     </ul>
@@ -20,6 +20,7 @@
     
 </div>
 
+<form action="/todopage" method="POST">
     <div>
         <input type="text" class="login-field" value="" placeholder="task" name="task">
         <input type="submit" value="Add Task" class="btn btn-primary btn-large btn-block" >
