@@ -1,4 +1,4 @@
-from flask import Flask, flash, redirect, render_template, request, session, abort, jsonify
+from flask import Flask, flash, redirect, render_template, request, session, abort, jsonify, url_for
 from flask import request
 from flask import render_template
 import os
@@ -75,19 +75,24 @@ def todo():
         if corr_user() == False:
             return redirect('/login')
         else:
-            return render_template('todo.html')
+            user = get_logged_in_user()
+            tasks = select_all_tasks(db, user.email)
+            return render_template('todo.html', tasks=tasks)
     else:
+        print("before add")
         user = get_logged_in_user()
         if request.form['task'] != None:
+            print("adding")
             add_todo_task(db, user.email, request.form['task'])
-            tasks = select_all_tasks(db, user.email)
-        return render_template('todo.html', tasks=tasks)
+        return redirect(url_for('todo'))
         
 
 @app.route('/todo_delete', methods=['POST'])
 def del_task():
+    print("deletin")
     var = request.json
-    delete_selected_task(db, request.form['task_id'])
+    user = get_logged_in_user()
+    delete_selected_task(db, request.form['task_id'], user.email )
     return jsonify({"success": True})
     
 

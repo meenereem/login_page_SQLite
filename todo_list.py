@@ -17,12 +17,15 @@ def select_all_tasks(db, email):
     tasks = [Task(r[0], r[1], r[2]) for r in c.fetchall()]
     return tasks
 
-def delete_selected_task(db, task_id):
+def delete_selected_task(db, task_id, email):
     c = db.cursor()
-    c.execute('delete from todo_list where task_id = ?', [task_id])
-    db.commit()
-
-
+    d = db.cursor()
+    string = 'SELECT {0}, {1}, {2} FROM todo_list WHERE {3}=?'.format(TASK_ID, FIELD_EMAIL, FIELD_TASK, TASK_ID)
+    c.execute(string, [task_id])
+    useremail = [Task(r[0], r[1], r[2]) for r in c.fetchall()]
+    if str(useremail[0].task_id) == str(task_id) and useremail[0].email == email:
+        d.execute('delete from todo_list where task_id = ?', [task_id])
+        db.commit()
 
 TABLE_NAME = 'todo_list'
 FIELD_EMAIL = 'email'
