@@ -9,12 +9,12 @@ class Session:
 def create_session_token(db, email):
     token = uuid.uuid4().hex
     session['token'] = token
+    session['email'] = email
     q_str = "INSERT INTO user_sessions ({1}, {2}) values (?, ?)".format(TABLE_NAME, FIELD_EMAIL, FIELD_TOKEN)
     c = db.cursor()
     c.execute(q_str, [email, token])
     db.commit()
 
-#problem with User in this method
 def get_one_by_email_session(db, email):
     if email is None:
         return None
@@ -25,6 +25,11 @@ def get_one_by_email_session(db, email):
     if len(user_sessions) < 1:
         return None
     return user_sessions[0]
+
+def delete_row(db, email):
+    c = db.cursor()
+    c.execute('delete from user_sessions WHERE email=?', (email))
+    db.commit()
 ########
 # Defs #
 ########

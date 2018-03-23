@@ -1,10 +1,12 @@
-from flask import Flask, flash, redirect, render_template, request, session, abort
+from flask import Flask, flash, redirect, render_template, request, session, abort, jsonify
 from flask import request
 from flask import render_template
 import os
+import json
 from users import *
 from database import *
 from sessions import *
+from todo_list import *
 import bcrypt
 from flask import g
 from postmarker.core import PostmarkClient
@@ -23,7 +25,7 @@ def teardown_request(exception):
 
 @app.route('/')
 def home():
-    if not session.get('logged_in'):
+    if get_logged_in_user() is None:
         return redirect('/login')
     else:
         return render_template('index.html')
@@ -43,18 +45,82 @@ def do_admin_signup():
 
 @app.route('/email', methods=['POST'])
 def send_result_email():
-        postmark = PostmarkClient(server_token='7547cae9-c42f-4c62-8886-86f034db9fce')
+        postmark = PostmarkClient(server_token='a27b1880-5284-4389-b274-b74d22b2b22c')
         postmark.emails.send(
-        From='fkuusisto@morgridge.org',
+        From='dng4@wisc.edu',
         To=request.form['email'],
         Subject='Message',
         HtmlBody=request.form['message'])
+        return render_template('index.html')
 
-@app.route('/logout', methods=['POST'])
+def corr_user():
+    token = session.get('token')
+    email = session.get('email')
+    user = get_one_by_email_session(db, email)
+    if user is None:
+        return False
+    if user.token == token:
+        return True
+    return False
+
+@app.route('/secondpage', methods=['POST', 'GET'])
+def route():
+    if corr_user() == False:
+        return redirect('/login')
+    else:
+        return render_template('secondpage.html')
+
+@app.route('/todopage', methods=['POST', 'GET'])
+def todo():
+    if corr_user() == False:
+        return redirect('/login')
+    else:
+        return render_template('todo.html')
+
+
+@app.route('/todo', methods=['POST', 'GET'])
+def add_task():
+    user = get_logged_in_user()
+    if request.form['task'] != None:
+        add_todo_task(db, user.email, request.form['task'])
+        tasks = select_all_tasks(db, user.email)
+    return render_template('todo.html', tasks=tasks)
+def del_task():
+    var = json.load(request.body)
+
+# @app.route('/todo', methods=['POST', 'GET'])
+# def del_task():
+#     if request.form['del_entry']:  
+    
+
+@app.route('/Index', methods=['POST', 'GET'])
+def ret():
+    if corr_user() == False:
+        return redirect('/login')
+    else:
+        return render_template('index.html')
+
+def get_logged_in_user():
+    token = session.get('token')
+    email = session.get('email')
+    if email != None and token != None:
+        user = get_one_by_email_session(db, email)
+        if user.token != token:
+            return None
+        else:
+            return user
+    return None
+
+
+@app.route('/logout', methods=['POST', 'GET'])
 def logout():
-        
-        session['logged_in'] = False
-        return home()
+    user = get_logged_in_user()
+    print(user)
+    if user is not None: 
+        delete_row(db, user.email)
+    session['email'] = None
+    session['token'] = None
+    return home()
 
 @app.route('/login', methods=['GET', 'POST'])
 def do_admin_login():
@@ -66,7 +132,6 @@ def do_admin_login():
         obj = get_one_by_email(db, request.form['username'])
         if bcrypt.checkpw(password.encode('utf-8'), obj.password) == True:
             create_session_token(db, request.form['username'])
-            # if session['token'] == obj2.token:
             return render_template('index.html', email = obj.email)
     return home()
  

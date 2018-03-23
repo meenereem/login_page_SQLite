@@ -1,0 +1,31 @@
+<head>
+    <script src="/static/todo.js"></script>
+</head>
+<form action="/todo" method="POST">
+<div id="f" class="page">
+    <h1>Task List</h1>
+    <ul>
+            {% for thing in tasks %}
+            <li id={{thing.task_id~"_item"}}><h>{{thing.task}}</h>
+            <button id={{thing.task_id~"_button"}}> Delete Task</button>
+            </li>
+            {% endfor %}
+    </ul>
+    <!-- <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script>
+    $(document).ready(function(){
+
+    });
+    </script> -->
+    
+</div>
+
+    <div>
+        <input type="text" class="login-field" value="" placeholder="task" name="task">
+        <input type="submit" value="Add Task" class="btn btn-primary btn-large btn-block" >
+    </div>
+</form>
+<p>click the button to return to index page</p>
+<form action="/Index" method="POST">
+<input type="submit" value="Index" class="btn btn-primary btn-large btn-block" >
+</form>
