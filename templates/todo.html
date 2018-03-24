@@ -11,20 +11,12 @@
             </li>
             {% endfor %}
     </ul>
-    <!-- <script>
-    $(document).ready(function() {
-    $("#submit").click(function() {
-        $.getJSON({
-        url: "/todo_delete"
-    </script> -->
 </div>
 
-<form action="/todopage" method="POST">
-    <div>
-        <input type="text" class="login-field" value="" placeholder="task" name="task">
-        <input type="submit" value="Add Task" class="btn btn-primary btn-large btn-block" >
-    </div>
-</form>
+<div>
+    <input id="new-task-input" type="text" class="login-field" value="" placeholder="task" name="task">
+    <button id="add-task-btn" class="btn btn-primary btn-large btn-block" onclick="addTask()">Add Task</button>
+</div>
 <p>click the button to return to index page</p>
 <form action="/Index" method="POST">
 <input type="submit" value="Index" class="btn btn-primary btn-large btn-block" >

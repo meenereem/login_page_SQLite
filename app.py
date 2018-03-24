@@ -71,29 +71,37 @@ def route():
 
 @app.route('/todopage', methods=['POST', 'GET'])
 def todo():
-    if request.method == 'GET':
-        if corr_user() == False:
-            return redirect('/login')
-        else:
-            user = get_logged_in_user()
-            tasks = select_all_tasks(db, user.email)
-            return render_template('todo.html', tasks=tasks)
+    if corr_user() == False:
+        return redirect('/login')
     else:
-        print("before add")
         user = get_logged_in_user()
-        if request.form['task'] != None:
-            print("adding")
-            add_todo_task(db, user.email, request.form['task'])
-        return redirect(url_for('todo'))
-        
+        tasks = select_all_tasks(db, user.email)
+        return render_template('todo.html', tasks=tasks)
+
+@app.route('/todo_add', methods=['POST'])
+def add_task():
+    print("before add")
+    user = get_logged_in_user()
+    tasks = select_all_tasks(db, user.email)
+    if request.form['task'] != None:
+        print("adding")
+        add_todo_task(db, user.email, request.form['task'])
+    return jsonify({"success": True})
 
 @app.route('/todo_delete', methods=['POST'])
 def del_task():
     print("deletin")
     var = request.json
     user = get_logged_in_user()
+    tasks = select_all_tasks(db, user.email)
     delete_selected_task(db, request.form['task_id'], user.email )
     return jsonify({"success": True})
+
+#     print("deletin")
+#     var = request.json
+#     user = get_logged_in_user()
+#     delete_selected_task(db, request.form['task_id'], user.email )
+#     return jsonify({"success": True})
     
 
 @app.route('/Index', methods=['POST', 'GET'])

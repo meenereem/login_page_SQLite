@@ -8,5 +8,28 @@ function deleteTask(button) {
                 type: "delete",
                 task_id: id
             },
+            function (data) {
+                if (data.success == true) {
+                    console.log(data);
+                    location.reload();
+                }
+            }
         );
+}
+
+function addTask() {
+    var newTask = $("#new-task-input").val();
+    $.post(
+        "/todo_add",
+        {
+            type: "add",
+            task: newTask
+        },
+        function (data) {
+            if (data.success == true) {
+                console.log(data);
+                location.reload();
+            }
+        }
+    )
 }
