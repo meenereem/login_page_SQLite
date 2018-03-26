@@ -80,17 +80,14 @@ def todo():
 
 @app.route('/todo_add', methods=['POST'])
 def add_task():
-    print("before add")
     user = get_logged_in_user()
     tasks = select_all_tasks(db, user.email)
     if request.form['task'] != None:
-        print("adding")
         add_todo_task(db, user.email, request.form['task'])
     return jsonify({"success": True})
 
 @app.route('/todo_delete', methods=['POST'])
 def del_task():
-    print("deletin")
     var = request.json
     user = get_logged_in_user()
     tasks = select_all_tasks(db, user.email)
