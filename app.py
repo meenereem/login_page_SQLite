@@ -11,7 +11,7 @@ import bcrypt
 from flask import g
 from postmarker.core import PostmarkClient
 app = Flask(__name__)
-
+# ssh dng@mir-38
 @app.before_request
 def before_request():
     g.db = sqlite3.connect("Untitled\\users\\Meenereem\\desktop\\database.db",  check_same_thread=False)
