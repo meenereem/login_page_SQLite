@@ -1,7 +1,6 @@
 function deleteTask(button) {
         var id = $(button).attr('id');
         console.log('#' + id + '_item')
-        // $('#' + id + '_item').remove();
         $.post(
             "/todo_delete",
             {
@@ -10,13 +9,11 @@ function deleteTask(button) {
             },
             function (data) {
                 if (data.success == true) {
-                    console.log(data);
                     location.reload();
                 }
             }
         );
 }
-
 function addTask() {
     var newTask = $("#new-task-input").val();
     $.post(
@@ -27,7 +24,6 @@ function addTask() {
         },
         function (data) {
             if (data.success == true) {
-                console.log(data);
                 location.reload();
             }
         }

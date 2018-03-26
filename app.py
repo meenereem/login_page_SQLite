@@ -97,13 +97,6 @@ def del_task():
     delete_selected_task(db, request.form['task_id'], user.email )
     return jsonify({"success": True})
 
-#     print("deletin")
-#     var = request.json
-#     user = get_logged_in_user()
-#     delete_selected_task(db, request.form['task_id'], user.email )
-#     return jsonify({"success": True})
-    
-
 @app.route('/Index', methods=['POST', 'GET'])
 def ret():
     if corr_user() == False:
